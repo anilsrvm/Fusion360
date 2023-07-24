@@ -68,7 +68,7 @@ def run(context):
                     rootComp = design.activeComponent
                     occ1 = rootComp.allOccurrences.item(i)
                     occ1.isIsolated = True
-component.isIsolated = True
+                    component.isIsolated = True
                     app.activeViewport.saveAsImageFile(output_path, 400, 400);
                     #ui.messageBox('Component 1 isloated. It will be unisolated on OK')
                     occ1.isIsolated = False
