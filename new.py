@@ -5,8 +5,8 @@ import adsk.core, adsk.cam, traceback
 import adsk.fusion
 import os
 
-    
-
+#Default values
+ask_ss = False
 
 def run(context):
            
@@ -23,14 +23,16 @@ def run(context):
             return
         
         def screenshot(file,name):
-            return
             #Isolate
             #file.rootComp.allOccurrences
             # parent = file.parentComponent
             # parent.activate()
-            file.isIsolated = True
-            app.activeViewport.saveAsImageFile(name, 400, 400);
-            file.isIsolated = False
+            #file.isIsolated = True
+            app.activeViewport.fit()
+            out = os.path.join(name + "/"+ directory)
+        
+            app.activeViewport.saveAsImageFile(out, 400, 400);
+            #file.isIsolated = False
             return
         
         #ask for folder
@@ -45,14 +47,15 @@ def run(context):
             # User canceled the dialog
             print("Folder selection canceled by user")
             return
-        ss_result = ui.messageBox(
-            "Add screenshot?",
-            "Export Objects",
-            adsk.core.MessageBoxButtonTypes.YesNoCancelButtonType,
-            adsk.core.MessageBoxIconTypes.QuestionIconType,
-        )
-        if ss_result == adsk.core.DialogResults.DialogCancel:
-             return 
+        if ask_ss == True:
+            ss_result = ui.messageBox(
+              "Add screenshot?",
+                "Export Objects",
+                adsk.core.MessageBoxButtonTypes.YesNoCancelButtonType,
+                adsk.core.MessageBoxIconTypes.QuestionIconType,
+            )
+        else:
+            ss_result= False
         #try to create folder
         #parent_dir = "C:/Users/RishiKrishna/Desktop/anil/plugin/folder"
         design = adsk.fusion.Design.cast(app.activeProduct)
@@ -78,7 +81,10 @@ def run(context):
         for body in rootComp.bRepBodies:
             parentname = body.parentComponent
             parentname=parentname.name
-            filename = parentname+body.name
+            if rootComp.bRepBodies.count==1:
+                filename = parentname
+            else:
+                filename = parentname+"_"+body.name
             export_stl(body, filename)
             if ss_result == adsk.core.DialogResults.DialogYes: 
                 screenshot(body, filename) 
@@ -89,14 +95,17 @@ def run(context):
             for body in bodies:
                 parentname = body.parentComponent
                 parentname=parentname.name
-                filename = parentname+body.name
+                if bodies.count==1:
+                    filename = parentname
+                else:
+                    filename = parentname+"_"+body.name
                 export_stl(body, filename)
                 if ss_result == adsk.core.DialogResults.DialogYes: 
                     screenshot(occ, filename)
 
                 # if not body.isVisible:
                 #     continue
-
+        screenshot(occ, path)
         ui.messageBox("STL files saved successfully.")
     except:
             if ui:
