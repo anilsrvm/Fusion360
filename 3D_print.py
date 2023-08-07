@@ -7,6 +7,11 @@ import os
 
 #Default values
 ask_ss = False
+pretext = "SYM_" 
+trimlength = 4
+visibility_det = False 
+include_hidden = True
+selected_only = False
 
 def run(context):
            
@@ -15,7 +20,7 @@ def run(context):
         ui  = app.userInterface
 
         def export_stl(component, output_path):
-            output_path = os.path.join(path, filename)
+            output_path = os.path.join(path, pre + filename)
             output_path = output_path + ".stl"
             export_mgr = design.exportManager
             stl_options = export_mgr.createSTLExportOptions(component, output_path)
@@ -28,9 +33,11 @@ def run(context):
             # parent = file.parentComponent
             # parent.activate()
             #file.isIsolated = True
+            # if ss_result == adsk.core.DialogResults.DialogYes: 
+            #     screenshot(body, filename) 
             app.activeViewport.goHome()
             app.activeViewport.fit()
-            out = os.path.join(name + "/"+ directory)
+            out = os.path.join(name + "/"+ pre + directory)
         
             app.activeViewport.saveAsImageFile(out, 400, 400);
             #file.isIsolated = False
@@ -62,6 +69,7 @@ def run(context):
         design = adsk.fusion.Design.cast(app.activeProduct)
         Name = design.parentDocument.name 
         directory = Name
+        pre=pretext+Name[:trimlength]+"_"
         path = os.path.join(selected_folder, directory) 
         if not os.path.exists(path):
             os.makedirs(path)
@@ -82,13 +90,13 @@ def run(context):
         for body in rootComp.bRepBodies:
             parentname = body.parentComponent
             parentname=parentname.name
+              
             if rootComp.bRepBodies.count==1:
                 filename = parentname
             else:
                 filename = parentname+"_"+body.name
             export_stl(body, filename)
-            if ss_result == adsk.core.DialogResults.DialogYes: 
-                screenshot(body, filename) 
+
 
         for i in range(0, rootComp.allOccurrences.count):
             occ = rootComp.allOccurrences.item(i)
@@ -96,13 +104,12 @@ def run(context):
             for body in bodies:
                 parentname = body.parentComponent
                 parentname=parentname.name
+
                 if bodies.count==1:
                     filename = parentname
                 else:
                     filename = parentname+"_"+body.name
                 export_stl(body, filename)
-                if ss_result == adsk.core.DialogResults.DialogYes: 
-                    screenshot(occ, filename)
 
                 # if not body.isVisible:
                 #     continue
