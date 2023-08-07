@@ -28,6 +28,7 @@ def run(context):
             # parent = file.parentComponent
             # parent.activate()
             #file.isIsolated = True
+            app.activeViewport.goHome()
             app.activeViewport.fit()
             out = os.path.join(name + "/"+ directory)
         
